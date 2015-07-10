@@ -1,59 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="//cdn.jsdelivr.net/peerjs/0.3.14/peer.min.js"></script>
-<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.deep_purple-green.min.css" />
-<script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="//cdn.jsdelivr.net/peerjs/0.3.14/peer.min.js"></script>
+  <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.deep_purple-green.min.css" />
+  <script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-<title>Follow Me</title>
-<meta name="description" content="FollowMe is an Android application that can be used to live-stream your location.">
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="cleartype" content="on">
+  <title>Follow Me</title>
+  <meta name="description" content="FollowMe is an Android application that can be used to live-stream your location.">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="cleartype" content="on">
+
+  <!-- iPad and iPad mini (with @2× display) iOS ≥ 8 -->
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="icon.png">
+  <!-- iPad 3+ (with @2× display) iOS ≥ 7 -->
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="icon.png">
+  <!-- iPad (with @2× display) iOS ≤ 6 -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="icon.png">
+  <!-- iPhone (with @2× and @3 display) iOS ≥ 7 -->
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="icon.png">
+  <!-- iPhone (with @2× display) iOS ≤ 6 -->
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="icon.png">
+  <!-- iPad mini and the first- and second-generation iPad (@1× display) on iOS ≥ 7 -->
+  <link rel="apple-touch-icon-precomposed" sizes="76x76" href="icon.png">
+  <!-- iPad mini and the first- and second-generation iPad (@1× display) on iOS ≤ 6 -->
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="icon.png">
+  <!-- Android Stock Browser and non-Retina iPhone and iPod Touch -->
+  <link rel="apple-touch-icon-precomposed" href="icon.png">
+  <!-- Fallback for everything else -->
+  <link rel="shortcut icon" href="icon.png">
+
+  <!--
+  Chrome 31+ has home screen icon 192×192 (the recommended size for multiple resolutions).
+  If it’s not defined on that size it will take 128×128.
+  -->
+  <link rel="icon" sizes="192x192" href="icon.png">
+  <link rel="icon" sizes="128x128" href="icon.png">
+
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="icon.png">
+  <meta name="msapplication-TileColor" content="#222222">
 
 
-<style type="text/css">
-.page-content, #map-canvas { height: 100vh; margin: 0; padding: 0; }
-</style>
-<script type="text/javascript"
-src="https://maps.googleapis.com/maps/api/js">
-</script>
-<script type="text/javascript">
-function initialize() {
-  var mapOptions = {
-    zoom: 17,
-    tilt: 30,
-  };
-  window.map = new google.maps.Map(document.getElementById('map-canvas'),
-  mapOptions);
-}
-google.maps.event.addDomListener(window, 'load', initialize);
-</script>
-<script>
-var peer = new Peer(null, {key: 'lwjd5qra8257b9'});
-var peerId = window.location.hash.replace('#', '').replace('/', '');
-var marker = null;
+  <style type="text/css">
+  .page-content, #map-canvas { height: 100vh; margin: 0; padding: 0; }
+  </style>
+  <script type="text/javascript"
+  src="https://maps.googleapis.com/maps/api/js">
+  </script>
+  <script type="text/javascript">
+  function initialize() {
+    var mapOptions = {
+      zoom: 17,
+      tilt: 30,
+    };
+    window.map = new google.maps.Map(document.getElementById('map-canvas'),
+    mapOptions);
+  }
+  google.maps.event.addDomListener(window, 'load', initialize);
+  </script>
+  <script>
+  var peer = new Peer(null, {key: 'lwjd5qra8257b9'});
+  var peerId = window.location.hash.replace('#', '').replace('/', '');
+  var marker = null;
 
-if (peerId) {
-  var conn = peer.connect(peerId);
-  conn.on('data', function(data) {
-    if (data.event === 'location-update') {
-      if (!marker) {
-        marker = new google.maps.Marker({map: window.map});
+  if (peerId) {
+    var conn = peer.connect(peerId);
+    conn.on('data', function(data) {
+      if (data.event === 'location-update') {
+        if (!marker) {
+          marker = new google.maps.Marker({map: window.map});
+        }
+
+        marker.setPosition({ lat: data.lat, lng: data.lng });
+        window.map.setCenter(marker.getPosition());
       }
+    });
 
-      marker.setPosition({ lat: data.lat, lng: data.lng });
-      window.map.setCenter(marker.getPosition());
-    }
-  });
-
-  conn.on('open', function() {
-    console.log("Opened!");
-  });
-}
-</script>
+    conn.on('open', function() {
+      console.log("Opened!");
+    });
+  }
+  </script>
 </head>
 <body>
   <!-- Always shows a header, even in smaller screens. -->
