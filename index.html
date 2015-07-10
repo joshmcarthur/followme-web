@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.deep_purple-green.min.css" />
+<script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<title>Follow Me</title>
+
+<style type="text/css">
+.page-content, #map-canvas { height: 100vh; margin: 0; padding: 0; }
+</style>
+<script type="text/javascript"
+src="https://maps.googleapis.com/maps/api/js">
+</script>
+<script type="text/javascript">
+function initialize() {
+  var mapOptions = {
+    zoom: 17,
+    tilt: 30,
+  };
+  window.map = new google.maps.Map(document.getElementById('map-canvas'),
+  mapOptions);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+<script>
+var peer = new Peer(null, {key: 'lwjd5qra8257b9'});
+var peerId = window.location.hash.replace('#', '').replace('/', '');
+var marker = null;
+
+if (peerId) {
+  var conn = peer.connect(peerId);
+  conn.on('data', function(data) {
+    if (data.event === 'location-update') {
+      if (!marker) {
+        marker = new google.maps.Marker({map: window.map});
+      }
+
+      marker.setPosition({ lat: data.lat, lng: data.lng });
+      window.map.setCenter(marker.getPosition());
+    }
+  });
+
+  conn.on('open', function() {
+    console.log("Opened!");
+  });
+}
+</script>
+</head>
+<body>
+  <!-- Always shows a header, even in smaller screens. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <!-- Title -->
+        <span class="mdl-layout-title">Follow Me</span>
+        <!-- Add spacer, to align navigation to the right -->
+        <div class="mdl-layout-spacer"></div>
+        <!-- Navigation. We hide it in small screens. -->
+        <nav class="mdl-navigation mdl-layout--large-screen-only">
+          <a class="mdl-navigation__link" href="https://github.com/joshmcarthur/followme-web">Source Code (Web)</a>
+          <a class="mdl-navigation__link" href="https://github.com/joshmcarthur/followme-android">Source Code (Android)</a>
+        </nav>
+      </div>
+    </header>
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title">Follow Me</span>
+      <nav class="mdl-navigation">
+        <a class="mdl-navigation__link" href="https://github.com/joshmcarthur/followme-web">Source Code (Web)</a>
+        <a class="mdl-navigation__link" href="https://github.com/joshmcarthur/followme-android">Source Code (Android)</a>
+      </nav>
+    </div>
+    <main class="mdl-layout__content">
+      <div class="page-content">
+        <div id="map-canvas"></div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
