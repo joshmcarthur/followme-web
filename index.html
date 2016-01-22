@@ -66,13 +66,14 @@
   google.maps.event.addDomListener(window, 'load', initialize);
   </script>
   <script>
-  var peer = new Peer(null, {key: 'lwjd5qra8257b9'});
+  var peer = new Peer(null, { host: 'sudojosh-peerjs-server.herokuapp.com', port: 443, secure: true});
   var peerId = window.location.hash.replace('#', '').replace('/', '');
   var marker = null;
 
   if (peerId) {
     var conn = peer.connect(peerId);
     conn.on('data', function(data) {
+      console.log("DATA", data);
       if (data.event === 'location-update') {
         if (!marker) {
           marker = new google.maps.Marker({map: window.map});
