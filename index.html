@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="//cdn.jsdelivr.net/peerjs/0.3.14/peer.min.js"></script>
+  <script src="peer.js"></script>
   <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.deep_purple-green.min.css" />
   <script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
   <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -55,39 +55,46 @@
   src="https://maps.googleapis.com/maps/api/js">
   </script>
   <script type="text/javascript">
-  function initialize() {
-    var mapOptions = {
-      zoom: 17,
-      tilt: 30,
-    };
-    window.map = new google.maps.Map(document.getElementById('map-canvas'),
-    mapOptions);
-  }
-  google.maps.event.addDomListener(window, 'load', initialize);
-  </script>
-  <script>
-  var peer = new Peer(null, { host: 'sudojosh-peerjs-server.herokuapp.com', port: 443, secure: true});
-  var peerId = window.location.hash.replace('#', '').replace('/', '');
-  var marker = null;
+    function initialize() {
+      console.log("STARTING!");
 
-  if (peerId) {
-    var conn = peer.connect(peerId);
-    conn.on('data', function(data) {
-      console.log("DATA", data);
-      if (data.event === 'location-update') {
-        if (!marker) {
-          marker = new google.maps.Marker({map: window.map});
-        }
+      var mapOptions = {
+        zoom: 17,
+        tilt: 30,
+        center: {lat: -42, lng: 174}
+      };
+      var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
-        marker.setPosition({ lat: data.lat, lng: data.lng });
-        window.map.setCenter(marker.getPosition());
+      var peer = new Peer(null, { host: 'sudojosh-peerjs-server.herokuapp.com', port: 443, secure: true, debug: 3});
+      var peerId = window.location.hash.replace('#', '').replace('/', '');
+      var marker = null;
+
+      if (peerId) {
+        var conn = peer.connect(peerId);
+        console.log(conn)
+        conn.on('data', function(data) {
+          console.log("DATA", data);
+          if (data.event === 'location-update') {
+            if (!marker) {
+              marker = new google.maps.Marker({map: window.map});
+            }
+
+            marker.setPosition({ lat: data.lat, lng: data.lng });
+            window.map.setCenter(marker.getPosition());
+          }
+        });
+
+        conn.on('error', function(err) {
+          console.log("Error", err);
+        })
+
+        conn.on('open', function() {
+          console.log("Opened!");
+        });
       }
-    });
+    }
 
-    conn.on('open', function() {
-      console.log("Opened!");
-    });
-  }
+    document.addEventListener('DOMContentLoaded', initialize);
   </script>
 </head>
 <body>
